@@ -3,16 +3,20 @@ package com.nafull.nafull.user;
 import com.nafull.nafull.common.ListData;
 import com.nafull.nafull.user.data.RegisterUser;
 import com.nafull.nafull.user.data.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
 public class UserController {
-    @GetMapping("/{userId}")
-    public User findOne(
-        @PathVariable final String userId
+    private final UserService userService;
+
+    @GetMapping("/discord-id/{discordId}")
+    public User findOneByDiscordId(
+        @PathVariable final String discordId
     ) {
-        throw new RuntimeException("Not Implemented!");
+        return userService.findOneByDiscordId(discordId);
     }
 
     @GetMapping("/all/discord-ids")
@@ -24,7 +28,7 @@ public class UserController {
     public User register(
         @RequestBody RegisterUser request
     ) {
-        throw new RuntimeException("Not Implemented!");
+        return userService.register(request);
     }
 
     @PostMapping("/login")

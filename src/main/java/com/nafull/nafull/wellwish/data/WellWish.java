@@ -6,7 +6,7 @@ import java.util.UUID;
 public record WellWish(
     UUID wellWishId,
     UUID senderId,
-    UUID receiverId,
+    String receiverDiscordId,
     String nickname,
     String content,
     Boolean locked

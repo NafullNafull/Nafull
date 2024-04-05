@@ -9,9 +9,8 @@ import java.util.UUID;
 public record User(
     UUID userId,
     String discordId,
-    List<WellWish> receivedWelWishes,
-    List<WellWish> sentWelWishes,
+    List<WellWish> receivedWellWishes,
+    List<WellWish> sentWellWishes,
     WellWishSpreadStatus wellWishSpreadStatus,
     Integer keyCount
-) {
-}
+) { }
