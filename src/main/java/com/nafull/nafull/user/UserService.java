@@ -41,7 +41,8 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("wellwish not found")); //TODO
 
         String discordId = wellWish.getReceiverDiscordId();
-        //TODO throw error when receiver already registered
+        if(repository.findByDiscordId(discordId).isPresent())
+            throw new RuntimeException("already registered"); //TODO
 
         final UUID userId = UUID.randomUUID();
         final String password = encoder.encode(dto.rawPassword());

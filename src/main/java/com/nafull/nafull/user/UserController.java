@@ -21,7 +21,7 @@ public class UserController {
 
     @GetMapping("/all/discord-ids")
     public ListData<String> findAllDiscordIds() {
-        throw new RuntimeException("Not Implemented!");
+        return userService.findAllDiscordIds();
     }
 
     @PostMapping("/register")
