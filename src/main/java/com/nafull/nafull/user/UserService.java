@@ -24,7 +24,7 @@ public class UserService {
 
     public User findOneByDiscordId(String discordId) {
         final UserEntity entity = repository.findByDiscordId(discordId)
-                .orElseThrow(() -> new RuntimeException("")); //TODO
+                .orElseThrow(() -> new RuntimeException("user not found!")); //TODO
 
         return aggregateToUser(entity);
     }
@@ -38,7 +38,7 @@ public class UserService {
     public User register(RegisterUser dto) {
         final WellWishEntity wellWish =
             wellWishRepository.findById(dto.wellWishId())
-                .orElseThrow(() -> new RuntimeException("wellwish not found"));
+                .orElseThrow(() -> new RuntimeException("wellwish not found")); //TODO
 
         String discordId = wellWish.getReceiverDiscordId();
         //TODO throw error when receiver already registered
@@ -46,11 +46,7 @@ public class UserService {
         final UUID userId = UUID.randomUUID();
         final String password = encoder.encode(dto.rawPassword());
 
-        final UserEntity user = UserEntity.byRegister(
-               userId,
-               password,
-               discordId
-        );
+        final UserEntity user = UserEntity.byRegister(userId, password, discordId);
         final UserEntity created = repository.save(user);
 
         return new User(
@@ -64,15 +60,16 @@ public class UserService {
     }
 
     public User login(LoginUser request) {
-        UserEntity user = repository.findByDiscordId(request.discordId())
-                .orElseThrow(() -> new RuntimeException("wrong id or password"));
+        UserEntity entity = repository.findByDiscordId(request.discordId())
+                .orElseThrow(() -> new RuntimeException("wrong id or password")); //TODO
 
-        String password = user.getEncodedPassword();
+        String password = entity.getEncodedPassword();
         boolean isMatch = encoder.matches(request.rawPassword(), password);
 
-//        if(!isMatch)
-            throw new RuntimeException("wrong id or password");
-//        return user.toDomain()
+        if(!isMatch)
+            throw new RuntimeException("wrong id or password"); //TODO
+
+        return aggregateToUser(entity);
     }
 
     private User aggregateToUser(UserEntity entity) {
