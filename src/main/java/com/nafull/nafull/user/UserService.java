@@ -4,6 +4,7 @@ import com.nafull.nafull.common.ListData;
 import com.nafull.nafull.common.ListUtil;
 import com.nafull.nafull.common.error.ErrorCode;
 import com.nafull.nafull.common.error.WebException;
+import com.nafull.nafull.statistic.data.UserStatistic;
 import com.nafull.nafull.user.data.LoginUser;
 import com.nafull.nafull.user.data.RegisterUser;
 import com.nafull.nafull.user.data.User;
@@ -15,6 +16,7 @@ import com.nafull.nafull.letter.data.Letter;
 import com.nafull.nafull.letter.entity.LetterEntity;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -79,7 +81,8 @@ public class UserService {
             List.of(),
             List.of(),
             0L,
-            0
+            created.getWingCount(),
+            created.getRegistrationTimestamp()
         );
     }
 
@@ -94,6 +97,30 @@ public class UserService {
             throw new WebException("ID 또는 비밀번호가 잘못되었어요", ErrorCode.WRONG_ID_OR_PASSWORD);
 
         return aggregateToUser(entity);
+    }
+
+    public UserStatistic calculateStatistics(UUID userId) {
+        Long registrationOrder = calculateUserRegistrationOrder(userId);
+        Long totalSpreadCount = calculateUserTotalSpreadCount(userId);
+
+        return new UserStatistic(
+                totalSpreadCount,
+                registrationOrder
+        );
+    }
+
+    public Long calculateUserRegistrationOrder(UUID userId) {
+        //FIXME Performance Issue!
+        List<UserEntity> allUsers = userRepository.findAll(Sort.by(Sort.Direction.ASC, "user_id"));
+        long registrationOrder = -1L;
+        for (int i = 0; i < allUsers.size(); i++) {
+            if(allUsers.get(i).getUserId() == userId) {
+                registrationOrder = i;
+                break;
+            }
+        }
+        if(registrationOrder == -1) throw new WebException("유저를 찾을 수 없어요!", ErrorCode.USER_NOT_FOUND);
+        return registrationOrder;
     }
 
     public Long calculateUserTotalSpreadCount(UUID userId) {
@@ -142,7 +169,8 @@ public class UserService {
             receivedWllWishes,
             sentLetters,
             calculateUserTotalSpreadCount(entity.getUserId()),
-            entity.getWingCount()
+            entity.getWingCount(),
+            entity.getRegistrationTimestamp()
         );
     }
 
@@ -150,5 +178,4 @@ public class UserService {
         return userRepository.findById(userId)
             .orElseThrow(() -> new WebException("유저를 찾을 수 없어요!", ErrorCode.USER_NOT_FOUND));
     }
-
 }

@@ -24,6 +24,8 @@ public class UserEntity {
 
     private Integer wingCount;
 
+    private Long registrationTimestamp;
+
     public static UserEntity byRegister(
         UUID userId,
         String encodedPassword,
@@ -33,7 +35,8 @@ public class UserEntity {
             userId,
             encodedPassword,
             discordId,
-            0
+            0,
+            System.currentTimeMillis()
         );
     }
 

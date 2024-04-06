@@ -11,7 +11,8 @@ public enum ErrorCode {
     WRONG_ID_OR_PASSWORD(HttpStatus.UNAUTHORIZED),
     DISCORD_USER_NOT_FOUND(HttpStatus.NOT_FOUND),
     NOT_ENOUGH_WINGS(HttpStatus.CONFLICT),
-    BADGE_NOT_FOUND(HttpStatus.NOT_FOUND);
+    BADGE_NOT_FOUND(HttpStatus.NOT_FOUND),
+    SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final HttpStatus httpStatus;
 

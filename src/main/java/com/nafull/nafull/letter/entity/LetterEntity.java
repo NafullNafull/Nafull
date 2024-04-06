@@ -42,7 +42,7 @@ public class LetterEntity {
             wish.senderNickname(),
             wish.content(),
             wish.badge(),
-            false
+            true
         );
     }
 
