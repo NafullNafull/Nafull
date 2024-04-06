@@ -2,7 +2,7 @@ package com.nafull.nafull.letter;
 
 import java.util.Random;
 
-public class LetterContent {
+public class LetterContents {
     private static final String TEMPLATE_01 =
         "%이름%님, 2박 3일간의 해커톤에 참여하시느라 정말 고생많으셨습니다!\n" +
         "멋진 성과와 경험을 쌓으셨을 거라 믿어 의심치 않습니다. 잘 해내셨어요!";

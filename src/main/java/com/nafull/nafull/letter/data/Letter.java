@@ -9,6 +9,7 @@ public record Letter(
     String receiverDiscordId,
     String nickname,
     String content,
+    BadgeType badge,
     Boolean locked
 ) {
     public static String LOCKED_CONTENT = "";

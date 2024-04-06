@@ -6,5 +6,6 @@ public record SendLetter(
     UUID senderId,
     String receiverDiscordId,
     String senderNickname,
-    String content
+    String content,
+    BadgeType badge
 ) {}

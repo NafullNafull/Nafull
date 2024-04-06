@@ -10,7 +10,8 @@ public enum ErrorCode {
     LETTER_NOT_FOUND(HttpStatus.NOT_FOUND),
     WRONG_ID_OR_PASSWORD(HttpStatus.UNAUTHORIZED),
     DISCORD_USER_NOT_FOUND(HttpStatus.NOT_FOUND),
-    NOT_ENOUGH_WINGS(HttpStatus.CONFLICT);
+    NOT_ENOUGH_WINGS(HttpStatus.CONFLICT),
+    BADGE_NOT_FOUND(HttpStatus.NOT_FOUND);
 
     private final HttpStatus httpStatus;
 

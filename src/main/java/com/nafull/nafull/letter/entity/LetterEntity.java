@@ -1,5 +1,6 @@
 package com.nafull.nafull.letter.entity;
 
+import com.nafull.nafull.letter.data.BadgeType;
 import com.nafull.nafull.letter.data.SendLetter;
 import com.nafull.nafull.letter.data.Letter;
 import jakarta.persistence.*;
@@ -29,6 +30,8 @@ public class LetterEntity {
 
     private String content;
 
+    private BadgeType badge;
+
     private Boolean locked;
 
     public static LetterEntity from(SendLetter wish) {
@@ -38,6 +41,7 @@ public class LetterEntity {
             wish.receiverDiscordId(),
             wish.senderNickname(),
             wish.content(),
+            wish.badge(),
             false
         );
     }
@@ -49,6 +53,7 @@ public class LetterEntity {
             receiverDiscordId,
             nickname,
             locked ? LOCKED_CONTENT : content,
+            badge,
             locked
         );
     }

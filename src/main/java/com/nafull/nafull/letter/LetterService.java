@@ -4,21 +4,22 @@ import com.nafull.nafull.common.ListData;
 import com.nafull.nafull.common.error.ErrorCode;
 import com.nafull.nafull.common.error.WebException;
 import com.nafull.nafull.discord.DiscordService;
-import com.nafull.nafull.letter.entity.LetterEntity;
-import com.nafull.nafull.user.UserService;
-import com.nafull.nafull.user.entity.UserEntity;
-import com.nafull.nafull.user.DefaultUser;
+import com.nafull.nafull.letter.data.BadgeType;
+import com.nafull.nafull.letter.data.Letter;
 import com.nafull.nafull.letter.data.ReceiveLetter;
 import com.nafull.nafull.letter.data.SendLetter;
-import com.nafull.nafull.letter.data.Letter;
+import com.nafull.nafull.letter.entity.LetterEntity;
+import com.nafull.nafull.user.DefaultUser;
+import com.nafull.nafull.user.UserService;
+import com.nafull.nafull.user.entity.UserEntity;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -58,13 +59,16 @@ public class LetterService {
     @Transactional
     public void receive(ReceiveLetter request) {
         String name = discordService.getUserNameByDiscordId(request.discordId());
-        String staticContent = LetterContent.generateContent(name);
+        String staticContent = LetterContents.generateContent(name);
+        int badgeIdx = new Random().nextInt(BadgeType.values().length);
+        BadgeType badge = BadgeType.values()[badgeIdx];
 
         SendLetter sendLetter = new SendLetter(
             defaultUser.getId(),
             request.discordId(),
             defaultUser.getNickname(),
-            staticContent
+            staticContent,
+            badge
         );
         send(new ListData<>(List.of(sendLetter)));
     }
@@ -80,8 +84,6 @@ public class LetterService {
             wingsBySender.put(senderId, wingsBySender.getOrDefault(senderId, 0) + 1);
         });
 
-        System.out.println(entities.size());
-        System.out.println(entities);
         List<LetterEntity> created = letterRepository.saveAll(entities);
 
         wingsBySender.entrySet().parallelStream().forEach(entry ->
