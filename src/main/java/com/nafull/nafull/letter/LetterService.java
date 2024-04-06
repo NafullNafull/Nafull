@@ -1,13 +1,11 @@
 package com.nafull.nafull.letter;
 
 import com.nafull.nafull.common.ListData;
+import com.nafull.nafull.common.ListUtil;
 import com.nafull.nafull.common.error.ErrorCode;
 import com.nafull.nafull.common.error.WebException;
 import com.nafull.nafull.discord.DiscordService;
-import com.nafull.nafull.letter.data.BadgeType;
-import com.nafull.nafull.letter.data.Letter;
-import com.nafull.nafull.letter.data.ReceiveLetter;
-import com.nafull.nafull.letter.data.SendLetter;
+import com.nafull.nafull.letter.data.*;
 import com.nafull.nafull.letter.entity.LetterEntity;
 import com.nafull.nafull.user.DefaultUser;
 import com.nafull.nafull.user.UserService;
@@ -17,10 +15,7 @@ import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class LetterService {
@@ -60,8 +55,7 @@ public class LetterService {
     public void receive(ReceiveLetter request) {
         String name = discordService.getUserNameByDiscordId(request.discordId());
         String staticContent = LetterContents.generateContent(name);
-        int badgeIdx = new Random().nextInt(BadgeType.values().length);
-        BadgeType badge = BadgeType.values()[badgeIdx];
+        BadgeType badge = ListUtil.random(BadgeType.values());
 
         SendLetter sendLetter = new SendLetter(
             defaultUser.getId(),
@@ -71,6 +65,25 @@ public class LetterService {
             badge
         );
         send(new ListData<>(List.of(sendLetter)));
+    }
+
+    @Transactional
+    public void sendRandom(ListData<SendLetterRandom> list) {
+        ListData<String> allDiscordIds = userService.findAllDiscordIds();
+        List<SendLetter> sendLetters = list.data().stream().map(
+            data -> {
+                String randomReceiverDiscordId = ListUtil.random(allDiscordIds.data());
+                return new SendLetter(
+                    data.senderId(),
+                    randomReceiverDiscordId,
+                    data.senderNickname(),
+                    data.content(),
+                    data.badge()
+                );
+            }
+        ).toList();
+        ListData<SendLetter> request = new ListData<>(sendLetters);
+        send(request);
     }
 
     @Transactional

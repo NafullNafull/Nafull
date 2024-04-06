@@ -1,10 +1,7 @@
 package com.nafull.nafull.letter;
 
 import com.nafull.nafull.common.ListData;
-import com.nafull.nafull.letter.data.ReceiveLetter;
-import com.nafull.nafull.letter.data.SendLetter;
-import com.nafull.nafull.letter.data.UnlockLetter;
-import com.nafull.nafull.letter.data.Letter;
+import com.nafull.nafull.letter.data.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +32,12 @@ public class LetterController {
         @RequestBody final ListData<SendLetter> request
     ) {
         letterService.send(request);
+    }
+    @PostMapping("/send/random")
+    public void sendRandom(
+        @RequestBody final ListData<SendLetterRandom> request
+    ) {
+        letterService.sendRandom(request);
     }
 
     @PatchMapping("/{letterId}/unlock")
