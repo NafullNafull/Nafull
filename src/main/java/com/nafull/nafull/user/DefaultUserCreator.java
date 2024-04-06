@@ -25,7 +25,7 @@ public class DefaultUserCreator implements ApplicationRunner {
             if(!Objects.equals(defaultUserOrNull.get().getDiscordId(), defaultUser.getDiscordId()))
                 throw new RuntimeException(
                     String.format(
-                        "default user discord id is diffrent! expect: %s, actual: %s",
+                        "default user discord id is different! expect: %s, actual: %s",
                         defaultUser.getDiscordId(),
                         defaultUserOrNull.get().getDiscordId()
                     ));
@@ -38,7 +38,8 @@ public class DefaultUserCreator implements ApplicationRunner {
             defaultUser.getId(),
             passwordEncoder.encode(defaultUser.getRawPassword()),
             defaultUser.getDiscordId(),
-            0
+            0,
+            "Nafull"
         );
         userRepository.save(entity);
     }

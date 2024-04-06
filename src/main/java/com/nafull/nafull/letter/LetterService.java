@@ -12,7 +12,6 @@ import com.nafull.nafull.letter.data.ReceiveLetter;
 import com.nafull.nafull.letter.data.SendLetter;
 import com.nafull.nafull.letter.data.Letter;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.map.HashedMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -56,7 +55,7 @@ public class LetterService {
     }
 
     @Transactional
-    public void receive(ReceiveLetter request) {
+    public void receive(ReceiveLetter request) { // 처음 회원가입 할 때
         String name = discordService.getUserNameByDiscordId(request.discordId());
         String staticContent = LetterContent.generateContent(name);
 
@@ -64,19 +63,26 @@ public class LetterService {
             defaultUser.getId(),
             request.discordId(),
             defaultUser.getNickname(),
-            staticContent
+            staticContent,
+            false
         );
         send(new ListData<>(List.of(sendLetter)));
     }
 
     @Transactional
-    public void send(ListData<SendLetter> list) {
+    public void send(ListData<SendLetter> list) { // 상대방에게 보낼 때
         List<LetterEntity> entities = list.data().stream()
             .map(LetterEntity::from).toList();
 
         Map<UUID, Integer> wingsBySender = new HashedMap<>();
         entities.forEach(entity -> {
-            UUID senderId = entity.getSenderId();
+            UUID senderId;
+            if (entity.getIsAnonymous()) {
+                // DB에 있는 유저 중 랜덤 발송
+                senderId = userService.makeRandomReceiver();
+            } else {
+                senderId = entity.getSenderId();
+            }
             wingsBySender.put(senderId, wingsBySender.getOrDefault(senderId, 0) + 1);
         });
 

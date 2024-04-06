@@ -4,6 +4,7 @@ import com.nafull.nafull.common.ListData;
 import com.nafull.nafull.common.ListUtil;
 import com.nafull.nafull.common.error.ErrorCode;
 import com.nafull.nafull.common.error.WebException;
+import com.nafull.nafull.letter.data.RandomUserInfo;
 import com.nafull.nafull.user.data.LoginUser;
 import com.nafull.nafull.user.data.RegisterUser;
 import com.nafull.nafull.user.data.User;
@@ -28,6 +29,11 @@ public class UserService {
     private final UserRelationRepository userRelationRepository;
     private final PasswordEncoder encoder;
     private final LetterRepository letterRepository;
+
+    public RandomUserInfo makeRandomReceiver() {
+        UserEntity userInfo = userRepository.findOneRandomUserId();
+        return new RandomUserInfo(userInfo.getUserId(), userInfo.getDiscordId());
+    }
 
     public User findOneByDiscordId(String discordId) {
         final UserEntity entity = userRepository.findByDiscordId(discordId)
@@ -57,7 +63,7 @@ public class UserService {
         final UUID userId = UUID.randomUUID();
         final String password = encoder.encode(dto.rawPassword());
 
-        final UserEntity user = UserEntity.byRegister(userId, password, discordId);
+        final UserEntity user = UserEntity.byRegister(userId, password, discordId, dto.nickName());
 
         final UUID spreaderId = letter.getSenderId();
         final UserRelation spreaderRelation = findUserRelation(spreaderId);
@@ -79,7 +85,8 @@ public class UserService {
             List.of(),
             List.of(),
             0L,
-            0
+            0,
+            created.getNickName()
         );
     }
 
@@ -142,7 +149,8 @@ public class UserService {
             receivedWllWishes,
             sentLetters,
             calculateUserTotalSpreadCount(entity.getUserId()),
-            entity.getWingCount()
+            entity.getWingCount(),
+            entity.getNickName()
         );
     }
 

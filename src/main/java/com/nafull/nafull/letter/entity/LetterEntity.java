@@ -7,7 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.nafull.nafull.letter.data.Letter.LOCKED_CONTENT;
@@ -31,6 +33,11 @@ public class LetterEntity {
 
     private Boolean locked;
 
+    private Boolean isAnonymous;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
+
     public static LetterEntity from(SendLetter wish) {
         return new LetterEntity(
             UUID.randomUUID(),
@@ -38,7 +45,9 @@ public class LetterEntity {
             wish.receiverDiscordId(),
             wish.senderNickname(),
             wish.content(),
-            false
+            false,
+            wish.isAnonymous(),
+            LocalDateTime.now()
         );
     }
 
