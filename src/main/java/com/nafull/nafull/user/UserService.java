@@ -4,6 +4,7 @@ import com.nafull.nafull.common.ListData;
 import com.nafull.nafull.common.ListUtil;
 import com.nafull.nafull.common.error.ErrorCode;
 import com.nafull.nafull.common.error.WebException;
+import com.nafull.nafull.letter.data.RandomUserInfo;
 import com.nafull.nafull.user.data.LoginUser;
 import com.nafull.nafull.user.data.RegisterUser;
 import com.nafull.nafull.user.data.User;
@@ -29,8 +30,9 @@ public class UserService {
     private final PasswordEncoder encoder;
     private final LetterRepository letterRepository;
 
-    public UUID makeRandomReceiver() {
-        return userRepository.findOneRandomUserId();
+    public RandomUserInfo makeRandomReceiver() {
+        UserEntity userInfo = userRepository.findOneRandomUserId();
+        return new RandomUserInfo(userInfo.getUserId(), userInfo.getDiscordId());
     }
 
     public User findOneByDiscordId(String discordId) {

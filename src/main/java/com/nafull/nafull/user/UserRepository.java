@@ -10,6 +10,6 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     Optional<UserEntity> findByDiscordId(String discordId);
 
-    @Query(value = "SELECT userId FROM UserEntity ORDER BY RAND() LIMIT 1", nativeQuery = true)
-    UUID findOneRandomUserId();
+    @Query(value = "SELECT * FROM user_entity u ORDER BY RAND() LIMIT 1", nativeQuery = true)
+    UserEntity findOneRandomUserId();
 }
