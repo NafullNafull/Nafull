@@ -11,3 +11,6 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: update
+discord:
+  token: ${DISCORD_TOKEN}
+  guild-id: 1225991352563798016
