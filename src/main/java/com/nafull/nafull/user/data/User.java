@@ -12,6 +12,7 @@ public record User(
     List<Letter> receivedLetters,
     List<Letter> sentLetters,
     Long totalSpreadCount,
+    Long registrationOrder,
     Integer wingCount,
     Long registrationStamp
 ) { }

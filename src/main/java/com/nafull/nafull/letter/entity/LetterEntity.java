@@ -1,14 +1,17 @@
 package com.nafull.nafull.letter.entity;
 
 import com.nafull.nafull.letter.data.BadgeType;
-import com.nafull.nafull.letter.data.SendLetter;
 import com.nafull.nafull.letter.data.Letter;
-import jakarta.persistence.*;
+import com.nafull.nafull.letter.data.SendLetter;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.UUID;
 
 import static com.nafull.nafull.letter.data.Letter.LOCKED_CONTENT;
@@ -34,6 +37,8 @@ public class LetterEntity {
 
     private Boolean locked;
 
+    private Long creationTimestamp;
+
     public static LetterEntity from(SendLetter wish) {
         return new LetterEntity(
             UUID.randomUUID(),
@@ -42,7 +47,8 @@ public class LetterEntity {
             wish.senderNickname(),
             wish.content(),
             wish.badge(),
-            true
+            true,
+            System.currentTimeMillis()
         );
     }
 
@@ -54,7 +60,8 @@ public class LetterEntity {
             nickname,
             locked ? LOCKED_CONTENT : content,
             badge,
-            locked
+            locked,
+            Instant.ofEpochMilli(creationTimestamp).atZone(ZoneId.systemDefault()).toLocalDateTime()
         );
     }
 }

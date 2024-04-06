@@ -45,7 +45,7 @@ public class LetterService {
         return this.letterBaseUri + "/" + entity.getLetterId();
     }
 
-    public Letter findOne(UUID letterId) {;
+    public Letter findOne(UUID letterId) {
         return letterRepository.findById(letterId)
             .orElseThrow(() -> new WebException("마음편지를 찾을 수 없어요", ErrorCode.LETTER_NOT_FOUND))
             .toDomainWithContentLock();
@@ -72,7 +72,13 @@ public class LetterService {
         ListData<String> allDiscordIds = userService.findAllDiscordIds();
         List<SendLetter> sendLetters = list.data().stream().map(
             data -> {
-                String randomReceiverDiscordId = ListUtil.random(allDiscordIds.data());
+                //FIXME Performance Issue!
+                //FIXME 서비스 유저가 1명일경우를 고려하지 않은 로직입니다.
+                String senderDiscordId = userService.findById(data.senderId()).getDiscordId();
+                List<String> senderExcludedDiscordIds = allDiscordIds.data().stream()
+                        .filter(id -> !id.equals(senderDiscordId)).toList();
+
+                String randomReceiverDiscordId = ListUtil.random(senderExcludedDiscordIds);
                 return new SendLetter(
                     data.senderId(),
                     randomReceiverDiscordId,
@@ -103,13 +109,11 @@ public class LetterService {
             userService.plusWings(entry.getKey(), entry.getValue())
         );
 
-        created.parallelStream().forEach(wish -> {
-            discordService.sendMessage(
-                wish.getNickname(),
-                wish.getReceiverDiscordId(),
-                generateLetterURI(wish)
-            );
-        });
+        created.parallelStream().forEach(wish -> discordService.sendMessage(
+            wish.getNickname(),
+            wish.getReceiverDiscordId(),
+            generateLetterURI(wish)
+        ));
     }
 
     @Transactional

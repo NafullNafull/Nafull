@@ -91,6 +91,7 @@ public class UserService {
             List.of(),
             List.of(),
             0L,
+            calculateUserRegistrationOrder(created.getUserId()),
             created.getWingCount(),
             created.getRegistrationTimestamp()
         );
@@ -180,6 +181,7 @@ public class UserService {
             receivedWllWishes,
             sentLetters,
             calculateUserTotalSpreadCount(entity.getUserId()),
+            calculateUserRegistrationOrder(entity.getUserId()),
             entity.getWingCount(),
             entity.getRegistrationTimestamp()
         );
