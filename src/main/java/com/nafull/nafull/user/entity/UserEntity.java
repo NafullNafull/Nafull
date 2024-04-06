@@ -24,16 +24,20 @@ public class UserEntity {
 
     private Integer wingCount;
 
+    private String nickName;
+
     public static UserEntity byRegister(
         UUID userId,
         String encodedPassword,
-        String discordId
+        String discordId,
+        String nickName
     ) {
         return new UserEntity(
             userId,
             encodedPassword,
             discordId,
-            0
+            0,
+            nickName
         );
     }
 

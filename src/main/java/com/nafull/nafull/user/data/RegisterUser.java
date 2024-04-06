@@ -5,5 +5,6 @@ import java.util.UUID;
 public record RegisterUser(
     UUID letterId,
     String rawPassword,
-    Boolean personalInformationAgreement
+    Boolean personalInformationAgreement,
+    String nickName
 ) {}
