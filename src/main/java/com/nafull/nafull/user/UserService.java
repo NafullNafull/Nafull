@@ -102,6 +102,22 @@ public class UserService {
                 .count();
     }
 
+    @Transactional
+    public void addWings(UUID userId, Integer countToAdd) {
+        UserEntity entity = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("user not found!")); //TODO
+        entity.addWings(countToAdd);
+        userRepository.save(entity);
+    }
+
+    @Transactional
+    public void minusWings(UUID userId, Integer countToMinus) {
+        UserEntity entity = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("user not found!")); //TODO
+        entity.minusWings(countToMinus);
+        userRepository.save(entity);
+    }
+
     private UserRelation findUserRelation(UUID userId) {
         final List<UserRelationEntity> entities = userRelationRepository.findAllByUserId(userId);
         final List<UUID> relateUserIds = entities.stream().map(UserRelationEntity::getRelateUserId).toList();
@@ -109,13 +125,13 @@ public class UserService {
     }
 
     private User aggregateToUser(UserEntity entity) {
-        final List<WellWish> receivedWllWishes = wellWishRepository.findAllById(
-                entity.getReceivedWelWishIds()
-        ).stream().map(WellWishEntity::toDomain).toList();
+        final List<WellWish> receivedWllWishes = wellWishRepository.findAllByReceiverDiscordId(
+                entity.getDiscordId()
+        ).stream().map(WellWishEntity::toDomainWithContentLock).toList();
 
-        final List<WellWish> sentWellWishes = wellWishRepository.findAllById(
-                entity.getSentWelWishIds()
-        ).stream().map(WellWishEntity::toDomain).toList();
+        final List<WellWish> sentWellWishes = wellWishRepository.findAllBySenderId(
+                entity.getUserId()
+        ).stream().map(WellWishEntity::toDomainWithContentLock).toList();
 
         return new User(
                 entity.getUserId(),
@@ -123,7 +139,13 @@ public class UserService {
                 receivedWllWishes,
                 sentWellWishes,
                 calculateUserTotalSpreadCount(entity.getUserId()),
-                entity.getKeyCount()
+                entity.getWingCount()
         );
     }
+
+    public UserEntity findById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("user not found!")); //TODO
+    }
+
 }

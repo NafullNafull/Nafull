@@ -1,5 +1,6 @@
 package com.nafull.nafull.wellwish.entity;
 
+import com.nafull.nafull.wellwish.data.SendWellWish;
 import com.nafull.nafull.wellwish.data.WellWish;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.UUID;
+
+import static com.nafull.nafull.wellwish.data.WellWish.LOCKED_CONTENT;
 
 @Entity
 @Getter
@@ -28,27 +31,24 @@ public class WellWishEntity {
 
     private Boolean locked;
 
-    public WellWishEntity(
-            UUID senderId,
-            String receiverDiscordId,
-            String senderNickname,
-            String content
-    ) {
-        this.wellWishId = UUID.randomUUID();
-        this.senderId = senderId;
-        this.receiverDiscordId = receiverDiscordId;
-        this.nickname = senderNickname;
-        this.content = content;
-        this.locked = false;
+    public static WellWishEntity from(SendWellWish wish) {
+        return new WellWishEntity(
+            UUID.randomUUID(),
+            wish.senderId(),
+            wish.receiverDiscordId(),
+            wish.senderNickname(),
+            wish.content(),
+            false
+        );
     }
 
-    public WellWish toDomain() {
+    public WellWish toDomainWithContentLock() {
         return new WellWish(
             wellWishId,
             senderId,
             receiverDiscordId,
             nickname,
-            content,
+            locked ? LOCKED_CONTENT : content,
             locked
         );
     }

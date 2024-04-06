@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -23,13 +22,7 @@ public class UserEntity {
     @Column(unique = true)
     private String discordId;
 
-    @ElementCollection
-    private List<UUID> receivedWelWishIds;
-
-    @ElementCollection
-    private List<UUID> sentWelWishIds;
-
-    private Integer keyCount;
+    private Integer wingCount;
 
     public static UserEntity byRegister(
         UUID userId,
@@ -37,12 +30,18 @@ public class UserEntity {
         String discordId
     ) {
         return new UserEntity(
-                userId,
-                encodedPassword,
-                discordId,
-                List.of(),
-                List.of(),
-                0
+            userId,
+            encodedPassword,
+            discordId,
+            0
         );
+    }
+
+    public void addWings(Integer countToAdd) {
+        wingCount += countToAdd;
+    }
+
+    public void minusWings(Integer countToAdd) {
+        wingCount -= countToAdd;
     }
 }

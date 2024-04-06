@@ -14,3 +14,9 @@ spring:
 discord:
   token: ${DISCORD_TOKEN}
   guild-id: 1225991352563798016
+user:
+  default:
+    id: ${DEFAULT_USER_ID}
+    discord-id: ${DEFAULT_USER_DISCORD_ID}
+    nickname: ${DEFAULT_USER_NICKNAME}
+    password: ${DEFAULT_USER_PASSWORD}
