@@ -27,6 +27,7 @@ public class WellWishController {
         @RequestBody final ReceiveWellWish request
     ) {
         // todo
+        // 받은 해당 url이 유효한 사람이 전송 받았는가?
         // 처음 마음을 받아서 유저가 회원가입 했을 때 default 값이 랜덤으로 들어가서 타인에게 공유할 수 있게 함
         throw new RuntimeException("Not Implemented!");
     }
@@ -36,9 +37,7 @@ public class WellWishController {
         @RequestBody final ListData<SendWellWish> request
     ) {
         // todo
-        // 접근할 수 있는 URL을 생성하여 보내줌
-        // 보내주는 것: URL, 보내는 사람의 닉네임
-        throw new RuntimeException("Not Implemented!");
+        wellWishService.sendLetter(request.data());
     }
 
     @PatchMapping("/{wellWishId}/unlock")
