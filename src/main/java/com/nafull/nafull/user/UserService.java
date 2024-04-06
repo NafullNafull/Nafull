@@ -140,7 +140,7 @@ public class UserService {
             .map(UserRelationEntity::getUserId)
             .distinct()
             .filter(id -> id != userId)
-            .count();
+            .count() - 1; //자기 자신을 카운트에 포함시키지 않는다.
     }
 
     @Transactional
