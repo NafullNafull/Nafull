@@ -29,11 +29,6 @@ public class UserEntity {
     @ElementCollection
     private List<UUID> sentWelWishIds;
 
-    private Integer totalSpreadCount;
-
-    @ElementCollection
-    private List<Integer> spreadCountPerDegree;
-
     private Integer keyCount;
 
     public static UserEntity byRegister(
@@ -46,8 +41,6 @@ public class UserEntity {
                 encodedPassword,
                 discordId,
                 List.of(),
-                List.of(),
-                0,
                 List.of(),
                 0
         );

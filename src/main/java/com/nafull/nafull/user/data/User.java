@@ -1,6 +1,5 @@
 package com.nafull.nafull.user.data;
 
-import com.nafull.nafull.wellwish.data.WellWishSpreadStatus;
 import com.nafull.nafull.wellwish.data.WellWish;
 
 import java.util.List;
@@ -11,6 +10,6 @@ public record User(
     String discordId,
     List<WellWish> receivedWellWishes,
     List<WellWish> sentWellWishes,
-    WellWishSpreadStatus wellWishSpreadStatus,
+    Long totalSpreadCount,
     Integer keyCount
 ) { }
