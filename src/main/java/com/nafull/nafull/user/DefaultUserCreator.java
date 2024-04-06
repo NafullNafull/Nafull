@@ -42,6 +42,7 @@ public class DefaultUserCreator implements ApplicationRunner {
             defaultUser.getId(),
             passwordEncoder.encode(defaultUser.getRawPassword()),
             defaultUser.getDiscordId(),
+            defaultUser.getNickname(),
             0,
             0L
         );

@@ -68,7 +68,7 @@ public class UserService {
         final UUID userId = UUID.randomUUID();
         final String password = encoder.encode(dto.rawPassword());
 
-        final UserEntity user = UserEntity.byRegister(userId, password, discordId);
+        final UserEntity user = UserEntity.byRegister(userId, dto.nickname(), password, discordId);
 
         final UUID spreaderId = letter.getSenderId();
         final UserRelation spreaderRelation = findUserRelation(spreaderId);
@@ -87,6 +87,7 @@ public class UserService {
         return new User(
             created.getUserId(),
             created.getDiscordId(),
+            created.getNickname(),
             List.of(),
             List.of(),
             0L,
@@ -95,12 +96,12 @@ public class UserService {
         );
     }
 
-    public User login(LoginUser request) {
-        final UserEntity entity = userRepository.findByDiscordId(request.discordId())
+    public User login(LoginUser dto) {
+        final UserEntity entity = userRepository.findByDiscordId(dto.discordId())
             .orElseThrow(() -> new WebException("ID 또는 비밀번호가 잘못되었어요", ErrorCode.WRONG_ID_OR_PASSWORD));
 
         final String password = entity.getEncodedPassword();
-        final boolean isPasswordMatch = encoder.matches(request.rawPassword(), password);
+        final boolean isPasswordMatch = encoder.matches(dto.rawPassword(), password);
 
         if(!isPasswordMatch)
             throw new WebException("ID 또는 비밀번호가 잘못되었어요", ErrorCode.WRONG_ID_OR_PASSWORD);
@@ -175,6 +176,7 @@ public class UserService {
         return new User(
             entity.getUserId(),
             entity.getDiscordId(),
+            entity.getNickname(),
             receivedWllWishes,
             sentLetters,
             calculateUserTotalSpreadCount(entity.getUserId()),

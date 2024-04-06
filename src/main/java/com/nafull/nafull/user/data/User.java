@@ -8,6 +8,7 @@ import java.util.UUID;
 public record User(
     UUID userId,
     String discordId,
+    String nickname,
     List<Letter> receivedLetters,
     List<Letter> sentLetters,
     Long totalSpreadCount,

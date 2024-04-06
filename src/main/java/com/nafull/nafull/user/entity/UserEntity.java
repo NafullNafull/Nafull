@@ -22,12 +22,15 @@ public class UserEntity {
     @Column(unique = true)
     private String discordId;
 
+    private String nickname;
+
     private Integer wingCount;
 
     private Long registrationTimestamp;
 
     public static UserEntity byRegister(
         UUID userId,
+        String nickname,
         String encodedPassword,
         String discordId
     ) {
@@ -35,6 +38,7 @@ public class UserEntity {
             userId,
             encodedPassword,
             discordId,
+            nickname,
             0,
             System.currentTimeMillis()
         );
