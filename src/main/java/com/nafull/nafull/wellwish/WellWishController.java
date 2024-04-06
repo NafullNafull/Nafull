@@ -36,7 +36,6 @@ public class WellWishController {
     public void send(
         @RequestBody final ListData<SendWellWish> request
     ) {
-        // todo
         wellWishService.sendLetter(request.data());
     }
 
