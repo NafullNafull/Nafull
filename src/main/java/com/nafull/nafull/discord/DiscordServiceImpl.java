@@ -2,19 +2,18 @@ package com.nafull.nafull.discord;
 
 import com.nafull.nafull.common.error.ErrorCode;
 import com.nafull.nafull.common.error.WebException;
+import com.nafull.nafull.letter.data.BadgeType;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
-import net.dv8tion.jda.api.utils.concurrent.Task;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 @Service
@@ -33,8 +32,13 @@ public class DiscordServiceImpl implements DiscordService {
 
 
     @Override
-    public void sendMessage(String senderNickname, String receiverDiscordId, String letterUri) {
-        MessageEmbed message = createMessage(senderNickname);
+    public void sendMessage(
+        String senderNickname,
+        String receiverDiscordId,
+        String letterUri,
+        BadgeType badge
+    ) {
+        MessageEmbed message = createMessage(senderNickname, badge);
         Button button = createButton(letterUri);
 
         withMemberByDiscordId(receiverDiscordId, member ->
@@ -64,10 +68,11 @@ public class DiscordServiceImpl implements DiscordService {
         return consumer.apply(member);
     }
 
-    private MessageEmbed createMessage(String senderNickname) {
+    private MessageEmbed createMessage(String senderNickname, BadgeType badge) {
         return new EmbedBuilder()
             .setTitle(senderNickname + "님이 보낸 마음편지가 도착했어요!")
             .setDescription("지금 바로 " + senderNickname + "님의 편지를 확인해보세요!")
+            .setImage(badge.getImageUrl())
             .setColor(Color.PINK)
             .setAuthor("@나풀")
             .build();

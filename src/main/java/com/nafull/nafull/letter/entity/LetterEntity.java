@@ -39,14 +39,14 @@ public class LetterEntity {
 
     private Long creationTimestamp;
 
-    public static LetterEntity from(SendLetter wish) {
+    public static LetterEntity from(SendLetter letter) {
         return new LetterEntity(
             UUID.randomUUID(),
-            wish.senderId(),
-            wish.receiverDiscordId(),
-            wish.senderNickname(),
-            wish.content(),
-            wish.badge(),
+            letter.senderId(),
+            letter.receiverDiscordId(),
+            letter.senderNickname(),
+            letter.content(),
+            letter.badge(),
             true,
             System.currentTimeMillis()
         );

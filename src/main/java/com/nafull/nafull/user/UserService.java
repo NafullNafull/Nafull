@@ -166,7 +166,7 @@ public class UserService {
     }
 
     private User aggregateToUser(UserEntity entity) {
-        final List<Letter> receivedWllWishes = letterRepository.findAllByReceiverDiscordId(
+        final List<Letter> receivedLetters = letterRepository.findAllByReceiverDiscordId(
             entity.getDiscordId()
         ).stream().map(LetterEntity::toDomainWithContentLock).toList();
 
@@ -178,7 +178,7 @@ public class UserService {
             entity.getUserId(),
             entity.getDiscordId(),
             entity.getNickname(),
-            receivedWllWishes,
+            receivedLetters,
             sentLetters,
             calculateUserTotalSpreadCount(entity.getUserId()),
             calculateUserRegistrationOrder(entity.getUserId()),

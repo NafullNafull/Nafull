@@ -109,10 +109,11 @@ public class LetterService {
             userService.plusWings(entry.getKey(), entry.getValue())
         );
 
-        created.parallelStream().forEach(wish -> discordService.sendMessage(
-            wish.getNickname(),
-            wish.getReceiverDiscordId(),
-            generateLetterURI(wish)
+        created.parallelStream().forEach(letter -> discordService.sendMessage(
+            letter.getNickname(),
+            letter.getReceiverDiscordId(),
+            generateLetterURI(letter),
+            letter.getBadge()
         ));
     }
 
