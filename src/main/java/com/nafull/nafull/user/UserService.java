@@ -41,7 +41,9 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("wellwish not found")); //TODO
 
         String discordId = wellWish.getReceiverDiscordId();
-        if(repository.findByDiscordId(discordId).isPresent())
+
+        boolean alreadyRegisteredDiscordId = repository.findByDiscordId(discordId).isPresent();
+        if(alreadyRegisteredDiscordId)
             throw new RuntimeException("already registered"); //TODO
 
         final UUID userId = UUID.randomUUID();
@@ -65,9 +67,9 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("wrong id or password")); //TODO
 
         String password = entity.getEncodedPassword();
-        boolean isMatch = encoder.matches(request.rawPassword(), password);
+        boolean isPasswordMatch = encoder.matches(request.rawPassword(), password);
 
-        if(!isMatch)
+        if(!isPasswordMatch)
             throw new RuntimeException("wrong id or password"); //TODO
 
         return aggregateToUser(entity);
