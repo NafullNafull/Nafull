@@ -20,3 +20,5 @@ user:
     discord-id: ${DEFAULT_USER_DISCORD_ID}
     nickname: ${DEFAULT_USER_NICKNAME}
     password: ${DEFAULT_USER_PASSWORD}
+letter:
+  base-uri:  http://localhost:3000/register

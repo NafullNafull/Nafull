@@ -26,6 +26,7 @@ public class SecurityConfig {
                         _unused -> {
                             CorsConfiguration configuration = new CorsConfiguration();
                             configuration.addAllowedOrigin("http://localhost:3000");
+                            configuration.addAllowedOrigin("https://204e-183-96-52-165.ngrok-free.app");
                             configuration.setAllowedMethods(List.of("*"));
                             configuration.setAllowedHeaders(List.of("*"));
                             configuration.setAllowCredentials(true);
@@ -36,15 +37,4 @@ public class SecurityConfig {
                 .sessionManagement(it -> it.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
-    /*
-
-                it.configurationSource {
-                    CorsConfiguration().apply {
-                        allowedOrigins = listOf("*")
-                        allowedMethods = listOf("*")
-                        allowedHeaders = listOf("*")
-                        allowCredentials = true
-                    }
-                }
-     */
 }

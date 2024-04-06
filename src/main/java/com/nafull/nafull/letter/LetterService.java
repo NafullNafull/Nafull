@@ -14,6 +14,7 @@ import com.nafull.nafull.letter.data.Letter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.map.HashedMap;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,17 +22,31 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class LetterService {
     private static final Integer WING_COUNT_REQUIRED_TO_UNLOCK = 2;
     private final LetterRepository letterRepository;
     private final UserService userService;
     private final DiscordService discordService;
     private final DefaultUser defaultUser;
+    private final String letterBaseUri;
 
-    private static String generateLetterURI(LetterEntity entity) {
-        String BASE_URL = "https://localhost:8080/api/v1/"; //FIXME
-        return BASE_URL + entity.getLetterId();
+    public LetterService(
+            LetterRepository letterRepository,
+            UserService userService,
+            DiscordService discordService,
+            DefaultUser defaultUser,
+            @Value("${letter.base-uri}")
+            String letterBaseUri
+    ) {
+        this.letterRepository = letterRepository;
+        this.userService = userService;
+        this.discordService = discordService;
+        this.defaultUser = defaultUser;
+        this.letterBaseUri = letterBaseUri;
+    }
+
+    private String generateLetterURI(LetterEntity entity) {
+        return this.letterBaseUri + "/" + entity.getLetterId();
     }
 
     public Letter findOne(UUID letterId) {;
@@ -42,7 +57,9 @@ public class LetterService {
 
     @Transactional
     public void receive(ReceiveLetter request) {
-        String staticContent = "[병역통지서] 이것은 혼신의 힘을 담아 작성한 당신만을 위한 이등병의 편지입니다.";
+        String name = discordService.getUserNameByDiscordId(request.discordId());
+        String staticContent = LetterContent.generateContent(name);
+
         SendLetter sendLetter = new SendLetter(
             defaultUser.getId(),
             request.discordId(),
@@ -63,6 +80,8 @@ public class LetterService {
             wingsBySender.put(senderId, wingsBySender.getOrDefault(senderId, 0) + 1);
         });
 
+        System.out.println(entities.size());
+        System.out.println(entities);
         List<LetterEntity> created = letterRepository.saveAll(entities);
 
         wingsBySender.entrySet().parallelStream().forEach(entry ->

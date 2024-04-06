@@ -7,11 +7,14 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.utils.concurrent.Task;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 @Service
@@ -34,24 +37,31 @@ public class DiscordServiceImpl implements DiscordService {
         MessageEmbed message = createMessage(senderNickname);
         Button button = createButton(letterUri);
 
-        withPrivateChannelByDiscordId(receiverDiscordId, channel -> sendMessage(channel, message, button));
+        withMemberByDiscordId(receiverDiscordId, member ->
+            member.getUser().openPrivateChannel()
+                .flatMap(channel -> sendMessage(channel, message, button))
+        ).queue();
     }
 
-    private void withPrivateChannelByDiscordId(
+    @Override
+    public String getUserNameByDiscordId(String discordId) {
+        String nickname = withMemberByDiscordId(discordId, member -> member.getUser().getName());
+        String pattern = "\\[([^\\[\\]]+)\\]";
+        return nickname.replaceAll(pattern, "").trim();
+    }
+
+    private <T> T withMemberByDiscordId(
         String discordId,
-        Function<PrivateChannel, MessageAction> consumer
+        Function<Member, T> consumer
     ) {
         Guild guild = Objects.requireNonNull(jda.getGuildById(guildId));
-        guild.loadMembers().onSuccess(members -> {
-            Member member = members.stream()
+        List<Member> members = guild.loadMembers().get();
+        Member member = members.stream()
                 .filter(m -> m.getEffectiveName().equals(discordId))
                 .findFirst()
                 .orElseThrow(() -> new WebException("디스코드 유저를 찾을 수 없어요!", ErrorCode.DISCORD_USER_NOT_FOUND));
 
-            member.getUser().openPrivateChannel()
-                .flatMap(consumer)
-                .queue();
-        });
+        return consumer.apply(member);
     }
 
     private MessageEmbed createMessage(String senderNickname) {
