@@ -1,7 +1,7 @@
-package com.nafull.nafull.wellwish.entity;
+package com.nafull.nafull.letter.entity;
 
-import com.nafull.nafull.wellwish.data.SendWellWish;
-import com.nafull.nafull.wellwish.data.WellWish;
+import com.nafull.nafull.letter.data.SendLetter;
+import com.nafull.nafull.letter.data.Letter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,16 +10,16 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-import static com.nafull.nafull.wellwish.data.WellWish.LOCKED_CONTENT;
+import static com.nafull.nafull.letter.data.Letter.LOCKED_CONTENT;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class WellWishEntity {
+public class LetterEntity {
     @Id
-    private UUID wellWishId;
+    private UUID letterId;
 
     private UUID senderId;
 
@@ -31,8 +31,8 @@ public class WellWishEntity {
 
     private Boolean locked;
 
-    public static WellWishEntity from(SendWellWish wish) {
-        return new WellWishEntity(
+    public static LetterEntity from(SendLetter wish) {
+        return new LetterEntity(
             UUID.randomUUID(),
             wish.senderId(),
             wish.receiverDiscordId(),
@@ -42,9 +42,9 @@ public class WellWishEntity {
         );
     }
 
-    public WellWish toDomainWithContentLock() {
-        return new WellWish(
-            wellWishId,
+    public Letter toDomainWithContentLock() {
+        return new Letter(
+            letterId,
             senderId,
             receiverDiscordId,
             nickname,

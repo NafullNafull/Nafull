@@ -1,8 +1,8 @@
-package com.nafull.nafull.wellwish.data;
+package com.nafull.nafull.letter.data;
 
 import java.util.UUID;
 
-public record SendWellWish(
+public record SendLetter(
     UUID senderId,
     String receiverDiscordId,
     String senderNickname,

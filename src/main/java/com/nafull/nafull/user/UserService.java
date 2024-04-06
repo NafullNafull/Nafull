@@ -2,14 +2,15 @@ package com.nafull.nafull.user;
 
 import com.nafull.nafull.common.ListData;
 import com.nafull.nafull.common.ListUtil;
+import com.nafull.nafull.user.data.LoginUser;
 import com.nafull.nafull.user.data.RegisterUser;
 import com.nafull.nafull.user.data.User;
 import com.nafull.nafull.user.data.UserRelation;
 import com.nafull.nafull.user.entity.UserEntity;
 import com.nafull.nafull.user.entity.UserRelationEntity;
-import com.nafull.nafull.wellwish.WellWishRepository;
-import com.nafull.nafull.wellwish.data.WellWish;
-import com.nafull.nafull.wellwish.entity.WellWishEntity;
+import com.nafull.nafull.letter.LetterRepository;
+import com.nafull.nafull.letter.data.Letter;
+import com.nafull.nafull.letter.entity.LetterEntity;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserRelationRepository userRelationRepository;
     private final PasswordEncoder encoder;
-    private final WellWishRepository wellWishRepository;
+    private final LetterRepository letterRepository;
 
     public User findOneByDiscordId(String discordId) {
         final UserEntity entity = userRepository.findByDiscordId(discordId)
@@ -41,11 +42,11 @@ public class UserService {
 
     @Transactional
     public User register(RegisterUser dto) {
-        final WellWishEntity wellWish =
-            wellWishRepository.findById(dto.wellWishId())
-                .orElseThrow(() -> new RuntimeException("wellwish not found")); //TODO
+        final LetterEntity letter =
+            letterRepository.findById(dto.letterId())
+                .orElseThrow(() -> new RuntimeException("letter not found")); //TODO
 
-        final String discordId = wellWish.getReceiverDiscordId();
+        final String discordId = letter.getReceiverDiscordId();
 
         final boolean alreadyRegisteredDiscordId = userRepository.findByDiscordId(discordId).isPresent();
         if(alreadyRegisteredDiscordId)
@@ -56,7 +57,7 @@ public class UserService {
 
         final UserEntity user = UserEntity.byRegister(userId, password, discordId);
 
-        final UUID spreaderId = wellWish.getSenderId();
+        final UUID spreaderId = letter.getSenderId();
         final UserRelation spreaderRelation = findUserRelation(spreaderId);
         final List<UUID> newRelateUserIds = ListUtil.merge(spreaderRelation.relateUserIds(), userId);
         final List<UserRelationEntity> newUserRelations = newRelateUserIds.stream().map(relateUserId ->
@@ -125,19 +126,19 @@ public class UserService {
     }
 
     private User aggregateToUser(UserEntity entity) {
-        final List<WellWish> receivedWllWishes = wellWishRepository.findAllByReceiverDiscordId(
+        final List<Letter> receivedWllWishes = letterRepository.findAllByReceiverDiscordId(
                 entity.getDiscordId()
-        ).stream().map(WellWishEntity::toDomainWithContentLock).toList();
+        ).stream().map(LetterEntity::toDomainWithContentLock).toList();
 
-        final List<WellWish> sentWellWishes = wellWishRepository.findAllBySenderId(
+        final List<Letter> sentLetters = letterRepository.findAllBySenderId(
                 entity.getUserId()
-        ).stream().map(WellWishEntity::toDomainWithContentLock).toList();
+        ).stream().map(LetterEntity::toDomainWithContentLock).toList();
 
         return new User(
                 entity.getUserId(),
                 entity.getDiscordId(),
                 receivedWllWishes,
-                sentWellWishes,
+                sentLetters,
                 calculateUserTotalSpreadCount(entity.getUserId()),
                 entity.getWingCount()
         );

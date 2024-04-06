@@ -1,10 +1,10 @@
-package com.nafull.nafull.wellwish.data;
+package com.nafull.nafull.letter.data;
 
 import java.util.Objects;
 import java.util.UUID;
 
-public record WellWish(
-    UUID wellWishId,
+public record Letter(
+    UUID letterId,
     UUID senderId,
     String receiverDiscordId,
     String nickname,
@@ -12,10 +12,10 @@ public record WellWish(
     Boolean locked
 ) {
     public static String LOCKED_CONTENT = "";
-    public WellWish {
+    public Letter {
         if(locked && !Objects.equals(content, LOCKED_CONTENT))
             throw new RuntimeException(
-                " content must be equal LOCKED_CONTENT when well-wish is locked"
+                " content must be equal LOCKED_CONTENT when letter is locked"
             );
     }
 }

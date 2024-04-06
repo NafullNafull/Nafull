@@ -1,6 +1,6 @@
 package com.nafull.nafull.user.data;
 
-import com.nafull.nafull.wellwish.data.WellWish;
+import com.nafull.nafull.letter.data.Letter;
 
 import java.util.List;
 import java.util.UUID;
@@ -8,8 +8,8 @@ import java.util.UUID;
 public record User(
     UUID userId,
     String discordId,
-    List<WellWish> receivedWellWishes,
-    List<WellWish> sentWellWishes,
+    List<Letter> receivedLetters,
+    List<Letter> sentLetters,
     Long totalSpreadCount,
     Integer keyCount
 ) { }

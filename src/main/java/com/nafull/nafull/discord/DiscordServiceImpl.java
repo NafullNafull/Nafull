@@ -28,9 +28,9 @@ public class DiscordServiceImpl implements DiscordService {
 
 
     @Override
-    public void sendMessage(String senderNickname, String receiverDiscordId, String wellWishUri) {
+    public void sendMessage(String senderNickname, String receiverDiscordId, String letterUri) {
         MessageEmbed message = createMessage(senderNickname);
-        Button button = createButton(wellWishUri);
+        Button button = createButton(letterUri);
 
         withPrivateChannelByDiscordId(receiverDiscordId, channel -> sendMessage(channel, message, button));
     }
@@ -61,8 +61,8 @@ public class DiscordServiceImpl implements DiscordService {
                 .build();
     }
 
-    private Button createButton(String wellWishUri) {
-        return Button.link(wellWishUri, "마음편지 보러가기")
+    private Button createButton(String letterUri) {
+        return Button.link(letterUri, "마음편지 보러가기")
                 .withEmoji(Emoji.fromUnicode("\uD83E\uDD8B"));
     }
 

@@ -1,6 +1,7 @@
 package com.nafull.nafull.user;
 
 import com.nafull.nafull.common.ListData;
+import com.nafull.nafull.user.data.LoginUser;
 import com.nafull.nafull.user.data.RegisterUser;
 import com.nafull.nafull.user.data.User;
 import lombok.RequiredArgsConstructor;

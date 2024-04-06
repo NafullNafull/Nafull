@@ -1,4 +1,4 @@
-package com.nafull.nafull.user;
+package com.nafull.nafull.user.data;
 
 public record LoginUser(
     String discordId,
