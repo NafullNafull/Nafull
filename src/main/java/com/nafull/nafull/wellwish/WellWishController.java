@@ -6,8 +6,6 @@ import com.nafull.nafull.wellwish.data.SendWellWish;
 import com.nafull.nafull.wellwish.data.WellWish;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/well-wishes")
 public class WellWishController {
