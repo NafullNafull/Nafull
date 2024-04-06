@@ -31,6 +31,8 @@ public class LetterEntity {
 
     private Boolean locked;
 
+    private Boolean isAnonymous;
+
     public static LetterEntity from(SendLetter wish) {
         return new LetterEntity(
             UUID.randomUUID(),
@@ -38,7 +40,8 @@ public class LetterEntity {
             wish.receiverDiscordId(),
             wish.senderNickname(),
             wish.content(),
-            false
+            false,
+            wish.isAnonymous()
         );
     }
 
