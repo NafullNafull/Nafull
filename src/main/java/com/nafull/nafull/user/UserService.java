@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -95,7 +94,7 @@ public class UserService {
     }
 
     public Long calculateUserTotalSpreadCount(UUID userId) {
-        final List<UserRelationEntity> list = userRelationRepository.findAllByRelateUserIdContains(userId);
+        final List<UserRelationEntity> list = userRelationRepository.findAllByRelateUserId(userId);
         return list.stream()
                 .map(UserRelationEntity::getUserId)
                 .distinct()
