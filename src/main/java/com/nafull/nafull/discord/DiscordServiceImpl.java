@@ -1,5 +1,7 @@
 package com.nafull.nafull.discord;
 
+import com.nafull.nafull.common.error.ErrorCode;
+import com.nafull.nafull.common.error.WebException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
@@ -36,34 +38,34 @@ public class DiscordServiceImpl implements DiscordService {
     }
 
     private void withPrivateChannelByDiscordId(
-            String discordId,
-            Function<PrivateChannel, MessageAction> consumer
+        String discordId,
+        Function<PrivateChannel, MessageAction> consumer
     ) {
         Guild guild = Objects.requireNonNull(jda.getGuildById(guildId));
         guild.loadMembers().onSuccess(members -> {
             Member member = members.stream()
-                    .filter(m -> m.getEffectiveName().equals(discordId))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("discord user id not found!")); //TODO
+                .filter(m -> m.getEffectiveName().equals(discordId))
+                .findFirst()
+                .orElseThrow(() -> new WebException("디스코드 유저를 찾을 수 없어요!", ErrorCode.DISCORD_USER_NOT_FOUND));
 
             member.getUser().openPrivateChannel()
-                    .flatMap(consumer)
-                    .queue();
+                .flatMap(consumer)
+                .queue();
         });
     }
 
     private MessageEmbed createMessage(String senderNickname) {
         return new EmbedBuilder()
-                .setTitle(senderNickname + "님이 보낸 마음편지가 도착했어요!")
-                .setDescription("지금 바로 " + senderNickname + "님의 편지를 확인해보세요!")
-                .setColor(Color.PINK)
-                .setAuthor("@나풀")
-                .build();
+            .setTitle(senderNickname + "님이 보낸 마음편지가 도착했어요!")
+            .setDescription("지금 바로 " + senderNickname + "님의 편지를 확인해보세요!")
+            .setColor(Color.PINK)
+            .setAuthor("@나풀")
+            .build();
     }
 
     private Button createButton(String letterUri) {
         return Button.link(letterUri, "마음편지 보러가기")
-                .withEmoji(Emoji.fromUnicode("\uD83E\uDD8B"));
+            .withEmoji(Emoji.fromUnicode("\uD83E\uDD8B"));
     }
 
     private MessageAction sendMessage(PrivateChannel channel, MessageEmbed message, Button button) {

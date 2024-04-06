@@ -1,6 +1,8 @@
 package com.nafull.nafull.letter;
 
 import com.nafull.nafull.common.ListData;
+import com.nafull.nafull.common.error.ErrorCode;
+import com.nafull.nafull.common.error.WebException;
 import com.nafull.nafull.discord.DiscordService;
 import com.nafull.nafull.letter.entity.LetterEntity;
 import com.nafull.nafull.user.UserService;
@@ -34,8 +36,8 @@ public class LetterService {
 
     public Letter findOne(UUID letterId) {;
         return letterRepository.findById(letterId)
-                .orElseThrow(() -> new RuntimeException("letter not found")) //TODo
-                .toDomainWithContentLock();
+            .orElseThrow(() -> new WebException("마음편지를 찾을 수 없어요", ErrorCode.LETTER_NOT_FOUND))
+            .toDomainWithContentLock();
     }
 
     @Transactional
@@ -79,14 +81,14 @@ public class LetterService {
     @Transactional
     public void unlock(UUID letterId, UUID userId) {
         LetterEntity letter = letterRepository.findById(letterId)
-            .orElseThrow(() -> new RuntimeException("letter not found!")); //TODO
+            .orElseThrow(() -> new WebException("마음편지를 찾을 수 없어요", ErrorCode.LETTER_NOT_FOUND));
         final UserEntity user = userService.findById(userId);
 
         if(!user.getDiscordId().equals(letter.getReceiverDiscordId()))
-            throw new RuntimeException("permission denied."); //TODO
+            throw new WebException("마음편지를 찾을 수 없어요", ErrorCode.LETTER_NOT_FOUND);
 
         if(user.getWingCount() < WING_COUNT_REQUIRED_TO_UNLOCK)
-            throw new RuntimeException("not enough wings");
+            throw new WebException("날갯짓이 부족해요", ErrorCode.NOT_ENOUGH_WINGS);
 
         letter.setLocked(false);
 

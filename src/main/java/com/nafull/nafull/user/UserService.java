@@ -2,6 +2,8 @@ package com.nafull.nafull.user;
 
 import com.nafull.nafull.common.ListData;
 import com.nafull.nafull.common.ListUtil;
+import com.nafull.nafull.common.error.ErrorCode;
+import com.nafull.nafull.common.error.WebException;
 import com.nafull.nafull.user.data.LoginUser;
 import com.nafull.nafull.user.data.RegisterUser;
 import com.nafull.nafull.user.data.User;
@@ -29,7 +31,7 @@ public class UserService {
 
     public User findOneByDiscordId(String discordId) {
         final UserEntity entity = userRepository.findByDiscordId(discordId)
-                .orElseThrow(() -> new RuntimeException("user not found!")); //TODO
+            .orElseThrow(() -> new WebException("유저를 찾을 수 없어요!", ErrorCode.USER_NOT_FOUND));
 
         return aggregateToUser(entity);
     }
@@ -44,13 +46,13 @@ public class UserService {
     public User register(RegisterUser dto) {
         final LetterEntity letter =
             letterRepository.findById(dto.letterId())
-                .orElseThrow(() -> new RuntimeException("letter not found")); //TODO
+                .orElseThrow(() -> new WebException("마음편지를 찾을 수 없어요", ErrorCode.LETTER_NOT_FOUND));
 
         final String discordId = letter.getReceiverDiscordId();
 
         final boolean alreadyRegisteredDiscordId = userRepository.findByDiscordId(discordId).isPresent();
         if(alreadyRegisteredDiscordId)
-            throw new RuntimeException("already registered"); //TODO
+            throw new WebException("이미 회원가입된 디스코드 ID에요", ErrorCode.ALREADY_REGISTERED);
 
         final UUID userId = UUID.randomUUID();
         final String password = encoder.encode(dto.rawPassword());
@@ -83,13 +85,13 @@ public class UserService {
 
     public User login(LoginUser request) {
         final UserEntity entity = userRepository.findByDiscordId(request.discordId())
-                .orElseThrow(() -> new RuntimeException("wrong id or password")); //TODO
+            .orElseThrow(() -> new WebException("ID 또는 비밀번호가 잘못되었어요", ErrorCode.WRONG_ID_OR_PASSWORD));
 
         final String password = entity.getEncodedPassword();
         final boolean isPasswordMatch = encoder.matches(request.rawPassword(), password);
 
         if(!isPasswordMatch)
-            throw new RuntimeException("wrong id or password"); //TODO
+            throw new WebException("ID 또는 비밀번호가 잘못되었어요", ErrorCode.WRONG_ID_OR_PASSWORD);
 
         return aggregateToUser(entity);
     }
@@ -97,16 +99,16 @@ public class UserService {
     public Long calculateUserTotalSpreadCount(UUID userId) {
         final List<UserRelationEntity> list = userRelationRepository.findAllByRelateUserId(userId);
         return list.stream()
-                .map(UserRelationEntity::getUserId)
-                .distinct()
-                .filter(id -> id != userId)
-                .count();
+            .map(UserRelationEntity::getUserId)
+            .distinct()
+            .filter(id -> id != userId)
+            .count();
     }
 
     @Transactional
     public void addWings(UUID userId, Integer countToAdd) {
         UserEntity entity = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("user not found!")); //TODO
+            .orElseThrow(() -> new WebException("유저를 찾을 수 없어요!", ErrorCode.USER_NOT_FOUND));
         entity.addWings(countToAdd);
         userRepository.save(entity);
     }
@@ -114,7 +116,7 @@ public class UserService {
     @Transactional
     public void minusWings(UUID userId, Integer countToMinus) {
         UserEntity entity = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("user not found!")); //TODO
+            .orElseThrow(() -> new WebException("유저를 찾을 수 없어요!", ErrorCode.USER_NOT_FOUND));
         entity.minusWings(countToMinus);
         userRepository.save(entity);
     }
@@ -127,26 +129,26 @@ public class UserService {
 
     private User aggregateToUser(UserEntity entity) {
         final List<Letter> receivedWllWishes = letterRepository.findAllByReceiverDiscordId(
-                entity.getDiscordId()
+            entity.getDiscordId()
         ).stream().map(LetterEntity::toDomainWithContentLock).toList();
 
         final List<Letter> sentLetters = letterRepository.findAllBySenderId(
-                entity.getUserId()
+            entity.getUserId()
         ).stream().map(LetterEntity::toDomainWithContentLock).toList();
 
         return new User(
-                entity.getUserId(),
-                entity.getDiscordId(),
-                receivedWllWishes,
-                sentLetters,
-                calculateUserTotalSpreadCount(entity.getUserId()),
-                entity.getWingCount()
+            entity.getUserId(),
+            entity.getDiscordId(),
+            receivedWllWishes,
+            sentLetters,
+            calculateUserTotalSpreadCount(entity.getUserId()),
+            entity.getWingCount()
         );
     }
 
     public UserEntity findById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("user not found!")); //TODO
+            .orElseThrow(() -> new WebException("유저를 찾을 수 없어요!", ErrorCode.USER_NOT_FOUND));
     }
 
 }
