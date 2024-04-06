@@ -35,8 +35,9 @@ public class WellWishService {
                 .map(SendWellWish::toEntity)
                 .forEach(wish -> {
                     wellWishRepository.save(wish);
-                    discordService.sendMessage(wish.getReceiverDiscordId(),
+                    discordService.sendMessage(
                             wish.getNickname(),
+                            wish.getReceiverDiscordId(),
                             BASE_URL + wish.getWellWishId());
                 });
     }
