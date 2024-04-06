@@ -87,7 +87,7 @@ public class LetterService {
         List<LetterEntity> created = letterRepository.saveAll(entities);
 
         wingsBySender.entrySet().parallelStream().forEach(entry ->
-            userService.addWings(entry.getKey(), entry.getValue())
+            userService.plusWings(entry.getKey(), entry.getValue())
         );
 
         created.parallelStream().forEach(wish -> {

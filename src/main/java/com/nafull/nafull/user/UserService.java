@@ -38,6 +38,15 @@ public class UserService {
         return aggregateToUser(entity);
     }
 
+    public UserEntity findById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new WebException("유저를 찾을 수 없어요!", ErrorCode.USER_NOT_FOUND));
+    }
+
+    public Long countAll() {
+        return userRepository.count();
+    }
+
     public ListData<String> findAllDiscordIds() {
         final List<UserEntity> users = userRepository.findAll();
         final List<String> discordIds = users.stream().map(UserEntity::getDiscordId).toList();
@@ -109,12 +118,12 @@ public class UserService {
         );
     }
 
-    public Long calculateUserRegistrationOrder(UUID userId) {
+    private Long calculateUserRegistrationOrder(UUID userId) {
         //FIXME Performance Issue!
-        List<UserEntity> allUsers = userRepository.findAll(Sort.by(Sort.Direction.ASC, "user_id"));
+        List<UserEntity> allUsers = userRepository.findAll(Sort.by(Sort.Direction.ASC, "registrationTimestamp"));
         long registrationOrder = -1L;
         for (int i = 0; i < allUsers.size(); i++) {
-            if(allUsers.get(i).getUserId() == userId) {
+            if(allUsers.get(i).getUserId().equals(userId)) {
                 registrationOrder = i;
                 break;
             }
@@ -133,7 +142,7 @@ public class UserService {
     }
 
     @Transactional
-    public void addWings(UUID userId, Integer countToAdd) {
+    public void plusWings(UUID userId, Integer countToAdd) {
         UserEntity entity = userRepository.findById(userId)
             .orElseThrow(() -> new WebException("유저를 찾을 수 없어요!", ErrorCode.USER_NOT_FOUND));
         entity.addWings(countToAdd);
@@ -172,10 +181,5 @@ public class UserService {
             entity.getWingCount(),
             entity.getRegistrationTimestamp()
         );
-    }
-
-    public UserEntity findById(UUID userId) {
-        return userRepository.findById(userId)
-            .orElseThrow(() -> new WebException("유저를 찾을 수 없어요!", ErrorCode.USER_NOT_FOUND));
     }
 }

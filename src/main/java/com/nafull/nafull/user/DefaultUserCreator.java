@@ -1,6 +1,8 @@
 package com.nafull.nafull.user;
 
+import com.nafull.nafull.user.data.UserRelation;
 import com.nafull.nafull.user.entity.UserEntity;
+import com.nafull.nafull.user.entity.UserRelationEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -9,12 +11,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class DefaultUserCreator implements ApplicationRunner {
     private final DefaultUser defaultUser;
     private final UserRepository userRepository;
+    private final UserRelationRepository userRelationRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -38,8 +42,16 @@ public class DefaultUserCreator implements ApplicationRunner {
             defaultUser.getId(),
             passwordEncoder.encode(defaultUser.getRawPassword()),
             defaultUser.getDiscordId(),
-            0
+            0,
+            0L
+        );
+
+        UserRelationEntity relation = new UserRelationEntity(
+            UUID.randomUUID(),
+            defaultUser.getId(),
+            defaultUser.getId()
         );
         userRepository.save(entity);
+        userRelationRepository.save(relation);
     }
 }
