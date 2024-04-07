@@ -27,7 +27,9 @@ public class SecurityConfig {
                             CorsConfiguration configuration = new CorsConfiguration();
                             configuration.addAllowedOrigin("http://localhost:3000");
                             configuration.addAllowedOrigin("http://10.10.6.114:3000");
+                            configuration.addAllowedOrigin("http://10.10.6.126:3000");
                             configuration.addAllowedOrigin("https://204e-183-96-52-165.ngrok-free.app");
+                            configuration.addAllowedOrigin("https://nafull-client.vercel.app");
                             configuration.setAllowedMethods(List.of("*"));
                             configuration.setAllowedHeaders(List.of("*"));
                             configuration.setAllowCredentials(true);

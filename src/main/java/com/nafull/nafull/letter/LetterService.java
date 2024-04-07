@@ -68,7 +68,7 @@ public class LetterService {
     }
 
     @Transactional
-    public void sendRandom(ListData<SendLetterRandom> list) {
+    public ListData<Letter> sendRandom(ListData<SendLetterRandom> list) {
         ListData<String> allDiscordIds = userService.findAllDiscordIds();
         List<SendLetter> sendLetters = list.data().stream().map(
             data -> {
@@ -76,7 +76,10 @@ public class LetterService {
                 //FIXME 서비스 유저가 1명일경우를 고려하지 않은 로직입니다.
                 String senderDiscordId = userService.findById(data.senderId()).getDiscordId();
                 List<String> senderExcludedDiscordIds = allDiscordIds.data().stream()
-                        .filter(id -> !id.equals(senderDiscordId)).toList();
+                    .filter(id ->
+                        !id.equals(senderDiscordId)
+                            && !id.equals(defaultUser.getDiscordId())
+                    ).toList();
 
                 String randomReceiverDiscordId = ListUtil.random(senderExcludedDiscordIds);
                 return new SendLetter(
@@ -88,12 +91,14 @@ public class LetterService {
                 );
             }
         ).toList();
+
         ListData<SendLetter> request = new ListData<>(sendLetters);
-        send(request);
+
+        return send(request);
     }
 
     @Transactional
-    public void send(ListData<SendLetter> list) {
+    public ListData<Letter> send(ListData<SendLetter> list) {
         List<LetterEntity> entities = list.data().stream()
             .map(LetterEntity::from).toList();
 
@@ -115,6 +120,13 @@ public class LetterService {
             generateLetterURI(letter),
             letter.getBadge()
         ));
+
+        List<Letter> letters = created
+            .stream()
+            .map(LetterEntity::toDomainWithContentLock)
+            .toList();
+
+        return new ListData<>(letters);
     }
 
     @Transactional

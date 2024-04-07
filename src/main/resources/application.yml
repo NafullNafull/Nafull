@@ -13,7 +13,7 @@ spring:
       ddl-auto: update
 discord:
   token: ${DISCORD_TOKEN}
-  guild-id: 1225991352563798016
+  guild-id: 807772766979620864
 user:
   default:
     id: ${DEFAULT_USER_ID}
@@ -21,4 +21,4 @@ user:
     nickname: ${DEFAULT_USER_NICKNAME}
     password: ${DEFAULT_USER_PASSWORD}
 letter:
-  base-uri:  http://localhost:3000/register
+  base-uri: https://nafull-client.vercel.app/register

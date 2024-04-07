@@ -28,16 +28,16 @@ public class LetterController {
     }
 
     @PostMapping("/send")
-    public void send(
+    public ListData<Letter> send(
         @RequestBody final ListData<SendLetter> request
     ) {
-        letterService.send(request);
+        return letterService.send(request);
     }
     @PostMapping("/send/random")
-    public void sendRandom(
+    public ListData<Letter> sendRandom(
         @RequestBody final ListData<SendLetterRandom> request
     ) {
-        letterService.sendRandom(request);
+        return letterService.sendRandom(request);
     }
 
     @PatchMapping("/{letterId}/unlock")

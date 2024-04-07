@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -61,7 +62,7 @@ public class DiscordServiceImpl implements DiscordService {
         Guild guild = Objects.requireNonNull(jda.getGuildById(guildId));
         List<Member> members = guild.loadMembers().get();
         Member member = members.stream()
-                .filter(m -> m.getEffectiveName().equals(discordId))
+                .filter(m -> m.getUser().getName().equals(discordId))
                 .findFirst()
                 .orElseThrow(() -> new WebException("디스코드 유저를 찾을 수 없어요!", ErrorCode.DISCORD_USER_NOT_FOUND));
 

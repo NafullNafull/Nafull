@@ -20,8 +20,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.temporal.Temporal;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -135,12 +138,25 @@ public class UserService {
     }
 
     public Long calculateUserTotalSpreadCount(UUID userId) {
-        final List<UserRelationEntity> list = userRelationRepository.findAllByRelateUserId(userId);
-        return list.stream()
-            .map(UserRelationEntity::getUserId)
-            .distinct()
-            .filter(id -> id != userId)
-            .count() - 1; //자기 자신을 카운트에 포함시키지 않는다.
+//        final List<UserRelationEntity> list = userRelationRepository.findAllByRelateUserId(userId);
+//        return list.stream()
+//            .map(UserRelationEntity::getUserId)
+//            .distinct()
+//            .filter(id -> id != userId)
+//            .count() - 1; //자기 자신을 카운트에 포함시키지 않는다.
+
+        UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new WebException("유저를 찾을 수 없어요!", ErrorCode.USER_NOT_FOUND));
+        List<LetterEntity> firstLetters = letterRepository.findAllByReceiverDiscordId(user.getDiscordId());
+        List<String> firstLetterDiscordIds = firstLetters.stream()
+                .map(LetterEntity::getReceiverDiscordId)
+                .distinct().toList();
+        List<LetterEntity> secondLetters = letterRepository.findAllByReceiverDiscordIdIsIn(firstLetterDiscordIds);
+        List<String> letters = Stream.of(firstLetters, secondLetters).flatMap(Collection::stream)
+                .map(LetterEntity::getReceiverDiscordId)
+                .distinct()
+                .toList();
+        return (long) letters.size();
     }
 
     @Transactional
@@ -166,13 +182,16 @@ public class UserService {
     }
 
     private User aggregateToUser(UserEntity entity) {
-        final List<Letter> receivedLetters = letterRepository.findAllByReceiverDiscordId(
+        final List<Letter> receivedLetters = new ArrayList<>(letterRepository.findAllByReceiverDiscordId(
             entity.getDiscordId()
-        ).stream().map(LetterEntity::toDomainWithContentLock).toList();
+        ).stream().map(LetterEntity::toDomainWithContentLock).toList());
 
-        final List<Letter> sentLetters = letterRepository.findAllBySenderId(
-            entity.getUserId()
-        ).stream().map(LetterEntity::toDomainWithContentLock).toList();
+        final List<Letter> sentLetters = new ArrayList<>(letterRepository.findAllBySenderId(
+                entity.getUserId()
+        ).stream().map(LetterEntity::toDomainWithContentLock).toList());
+
+        receivedLetters.sort(Comparator.comparingLong(e -> -e.createAt().toEpochSecond(ZoneOffset.UTC)));
+        sentLetters.sort(Comparator.comparingLong(e -> -e.createAt().toEpochSecond(ZoneOffset.UTC)));
 
         return new User(
             entity.getUserId(),

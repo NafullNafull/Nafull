@@ -1,6 +1,7 @@
 package com.nafull.nafull.letter.data;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.nafull.nafull.common.error.ErrorCode;
 import com.nafull.nafull.common.error.WebException;
 import lombok.Getter;
@@ -26,5 +27,11 @@ public enum BadgeType {
         return Arrays.stream(values())
                 .filter(el -> Objects.equals(el.name, str)).findFirst()
                 .orElseThrow(() -> new WebException("뱃지를 찾을 수 없어요", ErrorCode.BADGE_NOT_FOUND));
+    }
+
+    @Override
+    @JsonValue
+    public String toString() {
+        return name;
     }
 }
